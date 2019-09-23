@@ -1,0 +1,11 @@
+#+TITLE: Config Layer
+
+* Description
+
+This layer houses configuration updates typically clumped into
+~dotspacemacs/user-config~.
+
+1. Declares all layers, like ~git~ and ~python~.
+2. declares a bunch of functions.
+
+Here's a nice guide for how to mess with this stuff: http://www.modernemacs.com/post/migrate-layers/

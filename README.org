@@ -1,0 +1,8 @@
+* Spacemacs Configuration
+
+This is my Org configuration for Spacemacs. To get started:
+
+- Install spacemacs (develop branch, commit 3e93dec6635bf54fa8a36ac8da6d6b98a9775541)
+- clone this into `.spacemacs.d`
+
+More soon!

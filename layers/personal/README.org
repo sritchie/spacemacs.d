@@ -1,0 +1,6 @@
+#+TITLE: Personal Layer
+
+* Description
+
+These are my personal packages, as well as custom setup that's not really
+related to other projects... or that I haven't filed yet.

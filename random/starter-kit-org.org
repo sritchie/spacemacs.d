@@ -1,0 +1,302 @@
+
+** Speed keys
+   :PROPERTIES:
+   :CUSTOM_ID: speed-keys
+   :END:
+Speed commands enable single-letter commands in Org-mode files when
+the point is at the beginning of a headline, or at the beginning of a
+code block.
+
+See the `=org-speed-commands-default=' variable for a list of the keys
+and commands enabled at the beginning of headlines.  All code blocks
+are available at the beginning of a code block, the following key
+sequence =C-c C-v h= (bound to `=org-babel-describe-bindings=') will
+display a list of the code blocks commands and their related keys.
+
+#+begin_src emacs-lisp
+  (require 'org-tempo)
+  (setq org-use-speed-commands t)
+#+end_src
+
+** Code blocks
+   :PROPERTIES:
+   :CUSTOM_ID: babel
+   :END:
+This activates a number of widely used languages, you are encouraged
+to activate more languages using the customize interface for the
+`=org-babel-load-languages=' variable, or with an elisp form like the
+one below.  The customize interface of `=org-babel-load-languages='
+contains an up to date list of the currently supported languages.
+#+begin_src emacs-lisp
+  (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((emacs-lisp . t)
+       (shell . t)
+       (R . t)
+       (python . t)
+       (ruby . t)
+       (latex . t)
+       (haskell . t)
+       (clojure . t)
+       (dot . t)
+       (scala . t)))
+#+end_src
+
+You are encouraged to add the following to your personal configuration
+although it is not added by default as a security precaution.
+#+begin_src emacs-lisp
+  (setq org-confirm-babel-evaluate nil)
+#+end_src
+
+** Code block fontification
+   :PROPERTIES:
+   :CUSTOM_ID: code-block-fontification
+   :END:
+The following displays the contents of code blocks in Org-mode files
+using the major-mode of the code.  It also changes the behavior of
+=TAB= to as if it were used in the appropriate major mode.  This means
+that reading and editing code form inside of your Org-mode files is
+much more like reading and editing of code using its major mode.
+#+begin_src emacs-lisp
+  (setq org-src-fontify-natively t)
+  (setq org-src-tab-acts-natively t)
+#+end_src
+
+And, some basic ones for my blog:
+
+#+begin_src emacs-lisp
+  (setq org-babel-default-header-args:clojure
+        '((:results . "silent") (:tangle . "yes") (:mkdirp . "yes")))
+
+  (setq org-babel-default-header-args:scala
+        '((:results . "silent") (:mkdirp . "yes")))
+
+  (setq org-babel-default-header-args
+        '((:padline . "no")))
+
+  (setq org-publish-project-alist
+        '(("org-samritchie"
+           ;; Path to your org files.
+           :site-root "http://sritchie.github.io"
+           :base-directory "~/sritchie.github.com/org/"
+           :base-extension "org"
+
+           ;; Path to your Jekyll project.
+           :publishing-directory "~/sritchie.github.com/"
+           :recursive t
+           :publishing-function org-html-publish-to-html
+           :headline-levels 6
+           :html-extension "html"
+           :body-only t ;; Only export section between <body> </body>
+           :exclude "_drafts/*"
+           :with-toc nil
+
+           :section-numbers nil
+           :table-of-contents nil
+
+           :author "Sam Ritchie"
+           :email "sritchie@twitter.com")
+
+          ("summingbird"
+           ;; Path to your org files.
+           :base-directory
+           "~/code/twitter/science/src/scala/com/twitter/summingbird_internal/tutorial"
+           :base-extension "org"
+
+           ;; Path to your Jekyll project.
+           :publishing-directory "~/summingbird_site/"
+           :recursive t
+           :publishing-function org-publish-org-to-latex
+           :headline-levels 5
+           :html-extension "html"
+           :body-only t ;; Only export section between <body> </body>
+           :exclude "_drafts/*"
+
+           :section-numbers nil
+           :table-of-contents 3
+
+           :author "Sam Ritchie"
+           :email "sritchie@twitter.com")
+
+          ("org-static-sam"
+           :base-directory "~/sritchie.github.com/org/"
+           :base-extension "css\\|js\\|png\\|jpg\\|ico\\|gif\\|pdf\\|mp3\\|flac\\|ogg\\|swf\\|php\\|markdown\\|md\\|html\\|htm\\|sh\\|xml\\|gz\\|bz2\\|vcf\\|zip\\|txt\\|tex\\|otf\\|ttf\\|eot\\|rb\\|yml\\|htaccess\\|gitignore"
+           :publishing-directory "~/sritchie.github.com/"
+           :recursive t
+           :publishing-function org-publish-attachment)
+          ("sam" :components ("org-samritchie" "org-static-sam"))))
+#+end_src
+
+** The Library of Babel
+   :PROPERTIES:
+   :CUSTOM_ID: library-of-babel
+   :END:
+The library of babel contains makes many useful functions available
+for use by code blocks in *any* emacs file.  See the actual
+=library-of-babel.org= (located in the Org-mode =contrib/babel=
+directory) file for information on the functions, and see
+[[http://orgmode.org/worg/org-contrib/babel/intro.php#library-of-babel][worg:library-of-babel]] for more usage information.
+
+Code blocks can be loaded into the library of babel from any Org-mode
+file using the `org-babel-lob-ingest' function.
+
+#+BEGIN_SRC emacs-lisp
+  (define-skeleton org-skeleton
+    "Header info for a emacs-org file."
+    "Title: "
+    "#+TITLE:" str " \n"
+    "#+AUTHOR: Sam Ritchie\n"
+    "#+email: sritchie@twitter.com\n"
+    "#+BABEL: :mkdirp yes :tangle yes \n"
+    "-----")
+
+  (global-set-key [C-S-f4] 'org-skeleton)
+
+  (require 'ox-latex)
+  (require 'ox-confluence)
+
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
+  (setq org-latex-listings 'minted)
+  (append org-latex-minted-options
+          '(("frame" "lines")
+            ("fontsize" "\\scriptsize")
+            ("linenos" "")))
+
+  (setq org-latex-pdf-process
+        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+  (setq org-latex-listings 'minted)
+  (append org-latex-minted-langs
+          '((R "r")
+            (html "rhtml")
+            (emacs-lisp "common-lisp")
+            (cc "c++")
+            (cperl "perl")
+            (shell-script "bash")
+            (caml "ocaml")
+            (scala "scala")
+            (clojure "clojure")))
+
+  (setq org-html-head-include-scripts nil
+        org-html-head-include-default-style nil)
+  (setq org-html-postamble nil)
+  (setq org-html-validation-link nil)
+
+  (add-to-list 'org-latex-classes
+               '("longarticle"
+                 "\\documentclass[11pt]{book}"
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")))
+
+  (add-to-list 'org-latex-classes
+               '("book"
+                 "\\documentclass[11pt]{book}"
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")))
+
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  ;;; copy-code --- Copies highlighted code to the pasteboard as RTF
+
+  ;; Copyright (C) 2011 John Wiegley
+
+  ;; Author: John Wiegley <jwiegley@gmail.com>
+  ;; Created: 08 Dec 2011
+  ;; Version: 1.0
+  ;; Keywords: code clipboard pasteboard
+  ;; X-URL: https://github.com/jwiegley/copy-code
+
+  ;; This program is free software; you can redistribute it and/or
+  ;; modify it under the terms of the GNU General Public License as
+  ;; published by the Free Software Foundation; either version 2, or (at
+  ;; your option) any later version.
+
+  ;; This program is distributed in the hope that it will be useful, but
+  ;; WITHOUT ANY WARRANTY; without even the implied warranty of
+  ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ;; General Public License for more details.
+
+  ;; You should have received a copy of the GNU General Public License
+  ;; along with GNU Emacs; see the file COPYING.  If not, write to the
+  ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+  ;; Boston, MA 02111-1307, USA.
+
+  ;;; Commentary:
+
+  ;; Uses the tool "highlight", and the system utility "pbcopy" to copy the
+  ;; selected region (or the current buffer) as RTF to the system pasteboard.
+  ;;
+  ;; I bind this to M-a-w, or Cmd-Option-W on my Mac.  It's great for getting
+  ;; code from Emacs into Keynote as highlighted text with leading line numbers.
+  ;;
+  ;; The command `copy-code-as-rtf' also accepts prefix and numerical arguments:
+  ;;
+  ;;   C-u M-x copy-code-as-rtf        Don't use prefixed line numbers
+  ;;   M-24 M-x copy-code-as-rtf       Use a font-size of 24pt
+  ;;   M-- M-24 M-x copy-code-as-rtf   Use a font-size of 24pt, and no linnums
+
+  (defgroup copy-code nil
+    "Copies highlighted code to the pasteboard as RTF"
+    :group 'prog-mode)
+
+  ;;;###autoload
+  (defun copy-code-as-rtf (&optional font-size)
+    (interactive "P")
+    (let* ((real-font-size
+            (if (and font-size
+                     (/= (prefix-numeric-value font-size) 4))
+                (abs font-size)
+              40))
+           (common-options
+            (format "--font Monaco --font-size %d %s -O rtf --style fine_blue" ;; nightshimmer for dark background
+                    real-font-size
+                    (if (and font-size
+                             (or (= (prefix-numeric-value font-size) 4)
+                                 (< (prefix-numeric-value font-size) 0)))
+                        "--linenumbers" "")))
+           (temp-buffer (get-buffer-create " *code*")))
+      (shell-command-on-region
+       (if (region-active-p) (region-beginning) (point-min))
+       (if (region-active-p) (region-end) (point-max))
+       (format "highlight --syntax %s %s"
+               (file-name-extension (buffer-file-name)) common-options)
+       temp-buffer)
+      (with-current-buffer temp-buffer
+        (goto-char (point-max))
+        (search-backward "\\par\\pard")
+        (delete-region (match-beginning 0) (match-end 0))
+        (shell-command-on-region (point-min) (point-max) "pbcopy")
+        (kill-buffer (current-buffer)))
+      (message "Copied %s to pasteboard as RTF with font-size of %d"
+               (if (region-active-p) "region" "file")
+               real-font-size)))
+
+  (setq org-default-notes-file
+        (concat org-directory "~/Dropbox/org/notes.org"))
+
+  (define-key global-map "\C-cc" 'org-capture)
+
+  (setq org-capture-templates
+        '(
+          ("j" "Journal" entry (file+datetree "~/Dropbox/org/notes.org")
+           "* %?\nEntered on %U\n  %i\n  %a")))
+
+  (define-key global-map "\C-cn"
+    (lambda () (interactive) (org-capture nil "j")))
+#+END_SRC
+
+** Web Mode
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+
+#+END_SRC
