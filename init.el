@@ -281,7 +281,7 @@ values."
 
    ;; If non-nil smartparens-strict-mode will be enabled in programming modes.
    ;; (default nil)
-   dotspacemacs-smartparens-strict-mode t
+   dotspacemacs-smartparens-strict-mode nil
 
    ;; If non-nil pressing the closing parenthesis `)' key in insert mode passes
    ;; over any automatically added closing parenthesis, bracket, quote, etc…
@@ -323,10 +323,15 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
   (setq custom-file "~/.spacemacs.d/.custom-settings.el")
+  (require 'google)
 
   ;; I need this for now, since ensime-mode automatically adds itself.
   (add-hook 'scala-mode-hook (lambda ()
                                (ensime-mode -1)))
+
+  (add-hook 'markdown-mode-hook
+            #'(lambda ()
+                (add-hook 'before-save-hook #'google-mdformat-before-save nil t)))
   )
 
 (defun dotspacemacs/user-config/post-layer-load-config ()
@@ -341,6 +346,12 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (use-package company
     :config
     (push 'company-lsp company-backends))
+
+  (setq x-super-keysym 'meta)
+  (setq x-meta-keysym 'super)
+
+  (setq org-directory "/usr/local/home/samritchie/DriveFS/My Drive/org")
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
 
   ;; Really exit?
   (setq confirm-kill-emacs #'yes-or-no-p)
