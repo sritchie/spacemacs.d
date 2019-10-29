@@ -324,6 +324,7 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
   (setq custom-file "~/.spacemacs.d/.custom-settings.el")
+  (setq org-tasks-file nil)
   (require 'google)
 
   ;; I need this for now, since ensime-mode automatically adds itself.
@@ -344,14 +345,14 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (global-set-key (kbd "C-x C-k") 'kill-region)
 
   (setq company-lsp-async t)
-  (setq org-directory "/usr/local/home/samritchie/DriveFS/My Drive/org")
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
+  (setq org-directory "/usr/local/google/home/samritchie/DriveFS/My Drive/org")
   (setq org-tasks-file (concat org-directory "/gtd.org"))
-
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
   (customize-set-variable 'org-journal-dir (concat org-directory "/journal/"))
   (setq org-agenda-file-regexp "\\`\\\([^.].*\\.org\\\|[0-9]\\\{8\\\}\\\(\\.gpg\\\)?\\\)\\'")
 
-  (add-to-list 'org-agenda-files org-journal-dir)
+  ;; TODO fix this!
+  ;; (add-to-list 'org-agenda-files org-journal-dir)
 
   (defun org-journal-find-location ()
     ;; Open today's journal, but specify a non-nil prefix argument in order to
