@@ -324,6 +324,7 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
   (setq custom-file "~/.spacemacs.d/.custom-settings.el")
+  (setq org-tasks-file nil)
 
   ;; I need this for now, since ensime-mode automatically adds itself.
   (add-hook 'scala-mode-hook (lambda ()
@@ -346,7 +347,8 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (customize-set-variable 'org-journal-dir (concat org-directory "/journal/"))
   (setq org-agenda-file-regexp "\\`\\\([^.].*\\.org\\\|[0-9]\\\{8\\\}\\\(\\.gpg\\\)?\\\)\\'")
 
-  (add-to-list 'org-agenda-files org-journal-dir)
+  ;; TODO fix this!
+  ;; (add-to-list 'org-agenda-files org-journal-dir)
 
   (defun org-journal-find-location ()
     ;; Open today's journal, but specify a non-nil prefix argument in order to
