@@ -47,6 +47,7 @@ values."
    '(
      (config :location local)
      (personal :location local)
+     (org :variables org-enable-org-journal-support t)
      )
 
    ;; List of additional packages that will be installed without being
@@ -332,12 +333,39 @@ before packages are loaded. If you are unsure, you should try in setting them in
 (defun dotspacemacs/user-config/post-layer-load-config ()
   "Configuration to take place *after all* layers/pkgs are
   instantiated."
-  (global-set-key (kbd "s-<backspace>") 'backward-kill-word)
+  (global-set-key (kbd "s-<backspace>") 'backward-kill-global)
   (global-set-key (kbd "C-w") 'backward-kill-word)
+  (global-set-key (kbd "C-x C-k") 'kill-region)
   (global-set-key (kbd "C-x C-k") 'kill-region)
 
   (setq company-lsp-async t)
-  ;; Hack to make sure 'company-lsp is only pushed after company package is loaded
+  (setq org-directory "/Volumes/GoogleDrive/My Drive/org")
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
+  (setq org-tasks-file (concat org-directory "/gtd.org"))
+
+  (customize-set-variable 'org-journal-dir (concat org-directory "/journal/"))
+  (setq org-agenda-file-regexp "\\`\\\([^.].*\\.org\\\|[0-9]\\\{8\\\}\\\(\\.gpg\\\)?\\\)\\'")
+
+  (add-to-list 'org-agenda-files org-journal-dir)
+
+  (defun org-journal-find-location ()
+    ;; Open today's journal, but specify a non-nil prefix argument in order to
+    ;; inhibit inserting the heading; org-capture will insert the heading.
+    (org-journal-new-entry t)
+    ;; Position point on the journal's top-level heading so that org-capture
+    ;; will add the new entry as a child entry.
+    (goto-char (point-min)))
+
+  (setq org-capture-templates
+        '(
+          ("t" "Todo" entry (file+headline org-tasks-file "Tasks")
+           "* TODO %?\n  %i\n  %a")
+          ("j" "Journal entry"
+           entry
+           (function org-journal-find-location)
+           "** %(format-time-string org-journal-time-format)%^{Title}\n%i%?")))
+
+  ;; hack to make sure 'company-lsp is only pushed after company package is loaded
   (use-package company
     :config
     (push 'company-lsp company-backends))

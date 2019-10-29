@@ -36,6 +36,8 @@
          (?s (file . ,(concat dotspacemacs-directory "starter-kit.org")))
          (?b (file . ,(concat (getenv "HOME") "/.bashrc")))
          (?r (file . ,(concat dotspacemacs-directory "layers/personal/local/personal/personal.el")))
+         (?o (file . ,org-default-notes-file))
+         (?t (file . ,org-tasks-file))
          ))
   (set-register (car r) (cadr r)))
 
