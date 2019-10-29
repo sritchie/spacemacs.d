@@ -344,7 +344,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (global-set-key (kbd "C-x C-k") 'kill-region)
 
   (setq company-lsp-async t)
-  (setq org-directory "/Volumes/GoogleDrive/My Drive/org")
+  (setq org-directory "/usr/local/home/samritchie/DriveFS/My Drive/org")
   (setq org-default-notes-file (concat org-directory "/notes.org"))
   (setq org-tasks-file (concat org-directory "/gtd.org"))
 
@@ -377,9 +377,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   (setq x-super-keysym 'meta)
   (setq x-meta-keysym 'super)
-
-  (setq org-directory "/usr/local/home/samritchie/DriveFS/My Drive/org")
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
 
   ;; Really exit?
   (setq confirm-kill-emacs #'yes-or-no-p)
