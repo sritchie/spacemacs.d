@@ -10,7 +10,9 @@
    git
    helm
    smex
-   (org :variables org-want-todo-bindings t)
+   (org :variables
+        org-enable-org-journal-support t
+        org-want-todo-bindings t)
    (shell :variables
           shell-default-height 30
           shell-default-position 'bottom
@@ -21,6 +23,7 @@
    ;; Misc
    graphviz
    multiple-cursors
+   docker
 
    ;; Markups
    csv

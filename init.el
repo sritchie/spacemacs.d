@@ -42,12 +42,11 @@ values."
    dotspacemacs-configuration-layer-path '("~/.spacemacs.d/layers/")
 
 
-   ;; List of configuration layers to load.
+   ;; List of configuration layers to load. (add more to config/layers.el)
    dotspacemacs-configuration-layers
    '(
      (config :location local)
      (personal :location local)
-     (org :variables org-enable-org-journal-support t)
      )
 
    ;; List of additional packages that will be installed without being
@@ -282,7 +281,7 @@ values."
 
    ;; If non-nil smartparens-strict-mode will be enabled in programming modes.
    ;; (default nil)
-   dotspacemacs-smartparens-strict-mode t
+   dotspacemacs-smartparens-strict-mode nil
 
    ;; If non-nil pressing the closing parenthesis `)' key in insert mode passes
    ;; over any automatically added closing parenthesis, bracket, quote, etc…
@@ -308,8 +307,8 @@ values."
    ;; Not used for now. (default nil)
    dotspacemacs-default-package-repository nil
 
-   ;; Delete whitespace while saving buffer. Possible values are `all'
-   ;; to aggressively delete empty line and long sequences of whitespace,
+   ;; Delete whitespace while saving buffer. Possible values are `all' to
+   ;; aggressively delete empty line and long sequences of whitespace,
    ;; `trailing' to delete only the whitespace at end of lines, `changed'to
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
@@ -324,12 +323,19 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
   (setq custom-file "~/.spacemacs.d/.custom-settings.el")
+  (load custom-file)
   (setq org-tasks-file nil)
 
   ;; I need this for now, since ensime-mode automatically adds itself.
-  (add-hook 'scala-mode-hook (lambda ()
-                               (ensime-mode -1)))
-  )
+  (add-hook 'scala-mode-hook (lambda () (ensime-mode -1)))
+  (add-hook 'scheme-mode-hook #'turn-on-smartparens-strict-mode)
+  (add-hook 'emacs-lisp-mode-hook #'turn-on-smartparens-strict-mode)
+  (add-hook 'clojure-mode-hook #'turn-on-smartparens-strict-mode)
+  (add-hook 'cider-repl-mode-hook #'turn-on-smartparens-strict-mode)
+  (add-hook 'inferior-scheme-mode-hook #'turn-on-smartparens-strict-mode)
+
+  ;; tex input! I had to run `set-input-method' with TeX to get this going.
+  (add-hook 'clojure-mode-hook 'toggle-input-method))
 
 (defun dotspacemacs/user-config/post-layer-load-config ()
   "Configuration to take place *after all* layers/pkgs are
@@ -337,7 +343,12 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (global-set-key (kbd "s-<backspace>") 'backward-kill-global)
   (global-set-key (kbd "C-w") 'backward-kill-word)
   (global-set-key (kbd "C-x C-k") 'kill-region)
-  (global-set-key (kbd "C-x C-k") 'kill-region)
+  (global-set-key (kbd "s-/") 'comment-line)
+
+  (global-prettify-symbols-mode 1)
+
+  ;; the goods for lisps!
+  (sp-use-paredit-bindings)
 
   (setq company-lsp-async t)
   (setq org-directory "/Volumes/GoogleDrive/My Drive/org")
@@ -347,8 +358,14 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (customize-set-variable 'org-journal-dir (concat org-directory "/journal/"))
   (setq org-agenda-file-regexp "\\`\\\([^.].*\\.org\\\|[0-9]\\\{8\\\}\\\(\\.gpg\\\)?\\\)\\'")
 
+  (pyvenv-workon "deep")
+
   ;; TODO fix this!
   ;; (add-to-list 'org-agenda-files org-journal-dir)
+
+  (defun mechanics ()
+    (interactive)
+    (run-scheme "mechanics"))
 
   (defun org-journal-find-location ()
     ;; Open today's journal, but specify a non-nil prefix argument in order to
