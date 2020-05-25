@@ -362,10 +362,10 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; the goods for lisps. Important.
   (sp-use-paredit-bindings)
 
+  (require 'cmuscheme)
   (defun mechanics-local ()
     (interactive)
-    (run-scheme "mechanics"))
-
+    (run-cmu-scheme "mechanics"))
 
   ;; And finally, the goods for SICM.
   (defun mechanics ()
@@ -377,10 +377,21 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; Here's an older version that does NOT use my docker stuff.
   (defun mechanics-osx ()
     (interactive)
-    (run-scheme "mechanics-osx"))
+    (run-cmu-scheme "mechanics-osx"))
 
   ;; This is required for better LaTeX in org mode.
   (setq org-latex-create-formula-image-program 'dvisvgm)
+
+  ;; And this gives me nice export for LaTeX, using scheme. THIS is why I need
+  ;; the BS above, since this will load xscheme and overwrite the original
+  ;; stuff.
+  ;;
+  ;; required to get org-mode exporting the goodies.
+  (load "~/.spacemacs.d/ob-mit-scheme.el")
+  (require 'ob-mit-scheme)
+
+  ;; this is used by xscheme now.
+  (setq scheme-program-name "mechanics-osx")
 
   (setq company-lsp-async t)
   (setq org-directory "/Volumes/GoogleDrive/My Drive/org")

@@ -11,6 +11,7 @@
    helm
    smex
    (org :variables
+        org-enable-hugo-support t
         org-enable-org-journal-support t
         org-want-todo-bindings t)
    (shell :variables
