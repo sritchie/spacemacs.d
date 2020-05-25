@@ -45,8 +45,10 @@ values."
    ;; List of configuration layers to load. (add more to config/layers.el)
    dotspacemacs-configuration-layers
    '(
+     systemd
      (config :location local)
      (personal :location local)
+     racket
      )
 
    ;; List of additional packages that will be installed without being
@@ -330,6 +332,8 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (add-hook 'scala-mode-hook (lambda () (ensime-mode -1)))
   (add-hook 'scheme-mode-hook #'turn-on-smartparens-strict-mode)
   (add-hook 'emacs-lisp-mode-hook #'turn-on-smartparens-strict-mode)
+  (add-hook 'racket-mode-hook #'turn-on-smartparens-strict-mode)
+  (add-hook 'racket-repl-mode-hook #'turn-on-smartparens-strict-mode)
   (add-hook 'clojure-mode-hook #'turn-on-smartparens-strict-mode)
   (add-hook 'cider-repl-mode-hook #'turn-on-smartparens-strict-mode)
   (add-hook 'inferior-scheme-mode-hook #'turn-on-smartparens-strict-mode)
@@ -345,10 +349,38 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (global-set-key (kbd "C-x C-k") 'kill-region)
   (global-set-key (kbd "s-/") 'comment-line)
 
+  ;; Get the pretty lambdas.
   (global-prettify-symbols-mode 1)
 
-  ;; the goods for lisps!
+  (defun enable-pretty-lambdas ()
+    "Make them beautiful!"
+    (setq prettify-symbols-alist '(("lambda" . 955))))
+
+  (add-hook 'racket-mode-hook 'enable-pretty-lambdas)
+  (add-hook 'racket-repl-mode-hook 'enable-pretty-lambdas)
+
+  ;; the goods for lisps. Important.
   (sp-use-paredit-bindings)
+
+  (defun mechanics-local ()
+    (interactive)
+    (run-scheme "mechanics"))
+
+
+  ;; And finally, the goods for SICM.
+  (defun mechanics ()
+    (interactive)
+    (let ((default-directory (or (projectile-project-root)
+                                 default-directory)))
+      (call-interactively #'mechanics-local)))
+
+  ;; Here's an older version that does NOT use my docker stuff.
+  (defun mechanics-osx ()
+    (interactive)
+    (run-scheme "mechanics-osx"))
+
+  ;; This is required for better LaTeX in org mode.
+  (setq org-latex-create-formula-image-program 'dvisvgm)
 
   (setq company-lsp-async t)
   (setq org-directory "/Volumes/GoogleDrive/My Drive/org")
@@ -362,10 +394,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   ;; TODO fix this!
   ;; (add-to-list 'org-agenda-files org-journal-dir)
-
-  (defun mechanics ()
-    (interactive)
-    (run-scheme "mechanics"))
 
   (defun org-journal-find-location ()
     ;; Open today's journal, but specify a non-nil prefix argument in order to
@@ -401,7 +429,6 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
   (dotspacemacs/user-config/post-layer-load-config)
-
   ;; (global-set-key (kbd "M-x") 'smex)
   ;; (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 

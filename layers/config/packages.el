@@ -6,6 +6,7 @@
         evil
         helm
         ob org org-bullets
+
         ))
 
 ;;; Unowned Packages
@@ -59,14 +60,41 @@
     :post-config (add-to-list 'org-babel-load-languages '(dot . t))))
 
 (defun config/pre-init-org ()
+  '(("n" "#+NAME: ?")
+    ("L" "#+LaTeX: ")
+    ("h" "#+HTML: ")
+    ("q" "#+BEGIN_QUOTE\n\n#+END_QUOTE")
+    ("s" "#+BEGIN_SRC ?\n\n#+END_SRC")
+    ("se" "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC")
+    ("sp" "#+BEGIN_SRC python\n\n#+END_SRC"))
+
   (setq org-structure-template-alist
-        '(("n" "#+NAME: ?")
-          ("L" "#+LaTeX: ")
-          ("h" "#+HTML: ")
-          ("q" "#+BEGIN_QUOTE\n\n#+END_QUOTE")
-          ("s" "#+BEGIN_SRC ?\n\n#+END_SRC")
-          ("se" "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC")
-          ("sp" "#+BEGIN_SRC python\n\n#+END_SRC")))
+        '(("a" . "export ascii")
+          ("c" . "center")
+          ("C" . "comment")
+          ("e" . "example")
+          ("E" . "export")
+          ("h" . "export html")
+          ("l" . "export latex")
+          ("q" . "quote")
+          ("s" . "src")
+          ("se" . "src emacs-lisp")
+          ("sp" . "src python")
+          ("v" . "verse")))
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (shell . t)
+     (R . t)
+     (python . t)
+     (ruby . t)
+     (latex . t)
+     (haskell . t)
+     (clojure . t)
+     (dot . t)
+     (scala . t)
+     (scheme . t)))
 
   (add-hook 'org-mode-hook (lambda () (auto-fill-mode 1)))
   )
