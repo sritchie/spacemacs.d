@@ -446,3 +446,31 @@ you should place your code here."
   ;; This is your old M-x.
   ;;(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
   )
+
+;; Draft of a function that will kick every chapter out into its own file.
+(defun org-export-headlines-to-gfm ()
+  "Export all subtrees that are *not* tagged with :noexport: to
+separate files.
+
+Subtrees that do not have the :EXPORT_FILE_NAME: property set
+are exported to a filename derived from the headline text."
+  (interactive)
+  (save-buffer)
+  (let ((modifiedp (buffer-modified-p)))
+    (save-excursion
+      (goto-char (point-min))
+      (goto-char (re-search-forward "^*"))
+      (set-mark (line-beginning-position))
+      (goto-char (point-max))
+      (org-map-entries
+       (lambda ()
+         (let ((export-file (org-entry-get (point) "EXPORT_FILE_NAME")))
+           (unless export-file
+             (org-set-property
+              "EXPORT_FILE_NAME"
+              (concat "md/" (replace-regexp-in-string " " "_" (nth 4 (org-heading-components))))))
+           (deactivate-mark)
+           (org-gfm-export-to-markdown nil t)
+           (unless export-file (org-delete-property "EXPORT_FILE_NAME"))
+           (set-buffer-modified-p modifiedp)))
+       "-noexport" 'region-start-level))))
