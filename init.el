@@ -382,6 +382,13 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; This is required for better LaTeX in org mode.
   (setq org-latex-create-formula-image-program 'dvisvgm)
 
+  ;; This adds support for embedding dropbox images
+  (add-to-list 'org-html-inline-image-rules
+               `("https" . ,(format "\\.%s\\'"
+                                    (regexp-opt
+                                     '("gif?dl=1")
+                                     t))))
+
   ;; And this gives me nice export for LaTeX, using scheme. THIS is why I need
   ;; the BS above, since this will load xscheme and overwrite the original
   ;; stuff.
@@ -390,9 +397,72 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (load "~/.spacemacs.d/ob-mit-scheme.el")
   (require 'ob-mit-scheme)
 
+
   ;; this is used by xscheme now.
   (setq scheme-program-name "mechanics-osx")
 
+  ;; Now, the modifications for github flavored markdown export! This handles
+  ;; extra-escaping the inline syntax, so it's available for processing by the
+  ;; Mathjax interpreter.
+  (defmacro ->> (&rest body)
+    (let ((result (pop body)))
+      (dolist (form body result)
+        (setq result (append form (list result))))))
+
+  (defun replace-in-string (what with in)
+    (replace-regexp-in-string (regexp-quote what) with in nil 'literal))
+
+  (defun my-latex-filter-gfm-macro (text backend info)
+    "Replace \\R with \\mathbb{R}"
+    (when (org-export-derived-backend-p backend 'gfm)
+      (->> text
+           (replace-in-string "\\(" "\\\\(")
+           (replace-in-string "\\)" "\\\\)")
+           (replace-in-string "\\[" "\\\\[")
+           (replace-in-string "\\]" "\\\\]"))))
+
+  (require 'ox)
+  (add-to-list 'org-export-filter-latex-fragment-functions
+               'my-latex-filter-gfm-macro)
+
+  ;; now, some code to export chapters.
+    (defun org-export-md-chapters ()
+    "Export all subtrees that are *not* tagged with :noexport: to
+separate files.
+
+Subtrees that do not have the :EXPORT_FILE_NAME: property set
+are exported to a filename derived from the headline text."
+    (interactive)
+    (let ((ticker 1)
+          (fn 'org-gfm-export-to-markdown)
+          (modifiedp (buffer-modified-p)))
+      (save-excursion
+        (goto-char (point-min))
+        (goto-char (re-search-forward "^*"))
+        (set-mark (line-beginning-position))
+        (goto-char (point-max))
+        (org-map-entries
+         (lambda ()
+           (let ((export-file (org-entry-get (point) "EXPORT_FILE_NAME")))
+             (unless export-file
+               (org-set-property
+                "EXPORT_FILE_NAME"
+                (->> (nth 4 (org-heading-components))
+                     (replace-regexp-in-string " " "_")
+                     (replace-in-string ":" "")
+                     (downcase)
+                     (concat "md/" (number-to-string ticker) "_"))))
+             (deactivate-mark)
+             (funcall fn nil t)
+
+             ;; Increment the counter.
+             (setf ticker (1+ ticker))
+
+             (unless export-file (org-delete-property "EXPORT_FILE_NAME"))
+             (set-buffer-modified-p modifiedp)))
+         "-noexport" 'region-start-level))))
+
+  ;; Then, we proceed.
   (setq company-lsp-async t)
   (setq org-directory "/Volumes/GoogleDrive/My Drive/org")
   (setq org-default-notes-file (concat org-directory "/notes.org"))
@@ -446,31 +516,3 @@ you should place your code here."
   ;; This is your old M-x.
   ;;(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
   )
-
-;; Draft of a function that will kick every chapter out into its own file.
-(defun org-export-headlines-to-gfm ()
-  "Export all subtrees that are *not* tagged with :noexport: to
-separate files.
-
-Subtrees that do not have the :EXPORT_FILE_NAME: property set
-are exported to a filename derived from the headline text."
-  (interactive)
-  (save-buffer)
-  (let ((modifiedp (buffer-modified-p)))
-    (save-excursion
-      (goto-char (point-min))
-      (goto-char (re-search-forward "^*"))
-      (set-mark (line-beginning-position))
-      (goto-char (point-max))
-      (org-map-entries
-       (lambda ()
-         (let ((export-file (org-entry-get (point) "EXPORT_FILE_NAME")))
-           (unless export-file
-             (org-set-property
-              "EXPORT_FILE_NAME"
-              (concat "md/" (replace-regexp-in-string " " "_" (nth 4 (org-heading-components))))))
-           (deactivate-mark)
-           (org-gfm-export-to-markdown nil t)
-           (unless export-file (org-delete-property "EXPORT_FILE_NAME"))
-           (set-buffer-modified-p modifiedp)))
-       "-noexport" 'region-start-level))))

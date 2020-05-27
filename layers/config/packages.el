@@ -60,14 +60,6 @@
     :post-config (add-to-list 'org-babel-load-languages '(dot . t))))
 
 (defun config/pre-init-org ()
-  '(("n" "#+NAME: ?")
-    ("L" "#+LaTeX: ")
-    ("h" "#+HTML: ")
-    ("q" "#+BEGIN_QUOTE\n\n#+END_QUOTE")
-    ("s" "#+BEGIN_SRC ?\n\n#+END_SRC")
-    ("se" "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC")
-    ("sp" "#+BEGIN_SRC python\n\n#+END_SRC"))
-
   (setq org-structure-template-alist
         '(("a" . "export ascii")
           ("c" . "center")
@@ -78,6 +70,8 @@
           ("l" . "export latex")
           ("q" . "quote")
           ("s" . "src")
+          ("ss" . "src scheme")
+          ("ssl" . "src scheme :results value raw :exports both :cache yes")
           ("se" . "src emacs-lisp")
           ("sp" . "src python")
           ("v" . "verse")))
@@ -93,13 +87,15 @@
      (haskell . t)
      (clojure . t)
      (dot . t)
-     (scala . t)
      (scheme . t)))
 
-  (add-hook 'org-mode-hook (lambda () (auto-fill-mode 1)))
-  )
+  (add-hook 'org-mode-hook (lambda () (auto-fill-mode 1))))
 
 (defun config/post-init-org ()
+  ;; I do not know HOW this is sneaking in!
+  (setq org-babel-load-languages
+        (remove '(scala . t) org-babel-load-languages))
+
   (spacemacs/set-leader-keys-for-major-mode 'org-mode
     "r" 'org-refile
     "h" 'org-metaleft  ; Because of MacOS's damned, indestructable M-h binding...

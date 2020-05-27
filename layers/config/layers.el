@@ -45,7 +45,9 @@
            python-formatter 'yapf
            python-backend 'lsp
            )
-   (scala :variables
+   (scala :packages (not ensime)
+          :variables
           scala-auto-insert-asterisk-in-comments t
-          scala-backend 'scala-metals)
+          scala-backend 'scala-metals
+          )
    ))

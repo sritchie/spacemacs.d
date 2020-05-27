@@ -39,7 +39,7 @@ contains an up to date list of the currently supported languages.
        (haskell . t)
        (clojure . t)
        (dot . t)
-       (scala . t)))
+       ))
 #+end_src
 
 You are encouraged to add the following to your personal configuration
