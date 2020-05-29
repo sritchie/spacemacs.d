@@ -24,6 +24,7 @@
 
    ;; Misc
    graphviz
+   latex
    multiple-cursors
    docker
 

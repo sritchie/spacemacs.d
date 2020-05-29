@@ -44,7 +44,7 @@ values."
 
    ;; List of configuration layers to load. (add more to config/layers.el)
    dotspacemacs-configuration-layers
-   '(
+   '(rust
      systemd
      (config :location local)
      (personal :location local)
@@ -328,6 +328,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (load custom-file)
   (setq org-tasks-file nil)
 
+
   ;; I need this for now, since ensime-mode automatically adds itself.
   (add-hook 'scala-mode-hook (lambda () (ensime-mode -1)))
   (add-hook 'scheme-mode-hook #'turn-on-smartparens-strict-mode)
@@ -339,7 +340,13 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (add-hook 'inferior-scheme-mode-hook #'turn-on-smartparens-strict-mode)
 
   ;; tex input! I had to run `set-input-method' with TeX to get this going.
-  (add-hook 'clojure-mode-hook 'toggle-input-method))
+  (add-hook 'clojure-mode-hook 'toggle-input-method)
+
+  ;; Trying this out. this should be so good for lisp.
+  (add-hook 'scheme-mode-hook #'aggressive-indent-mode)
+  (add-hook 'clojure-mode-hook #'aggressive-indent-mode)
+  (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
+  )
 
 (defun dotspacemacs/user-config/post-layer-load-config ()
   "Configuration to take place *after all* layers/pkgs are
@@ -382,6 +389,18 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; This is required for better LaTeX in org mode.
   (setq org-latex-create-formula-image-program 'dvisvgm)
 
+  ;; I guess I can override this for specific images.
+  (setq org-image-actual-width nil)
+
+  ;; This sets properties for image downloading, so I can embed images directly.
+  (setq org-download-image-attr-list
+        '("#+attr_org: :width 400px"
+          "#+attr_html: :width 80% :align center"
+          "#+attr_latex: :width 8cm"))
+
+  ;; This lets me take screenshots on OS X.
+  (setq org-download-screenshot-method "screencapture -i %s")
+
   ;; This adds support for embedding dropbox images
   (add-to-list 'org-html-inline-image-rules
                `("https" . ,(format "\\.%s\\'"
@@ -397,7 +416,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (load "~/.spacemacs.d/ob-mit-scheme.el")
   (require 'ob-mit-scheme)
 
-
   ;; this is used by xscheme now.
   (setq scheme-program-name "mechanics-osx")
 
@@ -412,58 +430,122 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (defun replace-in-string (what with in)
     (replace-regexp-in-string (regexp-quote what) with in nil 'literal))
 
-  (defun my-latex-filter-gfm-macro (text backend info)
-    "Replace \\R with \\mathbb{R}"
+  (defun escape-gfm-latex-characters (text)
+    (->> text
+         (replace-in-string "\\(" "\\\\(")
+         (replace-in-string "\\)" "\\\\)")
+         (replace-in-string "\\[" "\\\\[")
+         (replace-in-string "\\]" "\\\\]")
+         (replace-in-string "_" "\\_")))
+
+  (defun org-gfm-latex-filter (text backend info)
+    "Properly escape code so it gets rendered."
     (when (org-export-derived-backend-p backend 'gfm)
-      (->> text
-           (replace-in-string "\\(" "\\\\(")
-           (replace-in-string "\\)" "\\\\)")
-           (replace-in-string "\\[" "\\\\[")
-           (replace-in-string "\\]" "\\\\]"))))
+      (escape-gfm-latex-characters text)))
+
+  ;; TODO this should only happen if you're actually in a github repository.
+  ;;
+  ;; TODO it WOULD be nice to get some resizing going by emitting these images
+  ;; as actual embedded HTML. for the future!
+  (defun org-gfm-link-filter (text backend info)
+    "Render github markdown links for images stored in the folder."
+    (when (and (org-export-derived-backend-p backend 'gfm)
+               ;; only get images.
+               (string-prefix-p "!" text))
+      (let* ((remote (git-link--select-remote))
+             (remote-url (git-link--remote-url remote)))
+        (when-let ((remote-info (when remote-url (git-link--parse-remote remote-url))))
+          (let ((url (format "https://%s/%s" (car remote-info) (cadr remote-info))))
+            (replace-in-string "images/" (concat url "/raw/master/images/") text))))))
 
   (require 'ox)
-  (add-to-list 'org-export-filter-latex-fragment-functions
-               'my-latex-filter-gfm-macro)
+
+  ;; These are required to get proper escaping in github-flavored markdown for
+  ;; latex snippets and embedded equations and environments.
+  (add-to-list 'org-export-filter-latex-fragment-functions 'org-gfm-latex-filter)
+  (add-to-list 'org-export-filter-latex-environment-functions 'org-gfm-latex-filter)
+  (add-to-list 'org-export-filter-link-functions 'org-gfm-link-filter)
+
+  ;; Override the built-in stuff in org-md-export-block, since I don't want to
+  ;; declare my own backend.
+  (defun org-md-export-block (export-block contents info)
+    "Transcode a EXPORT-BLOCK element from Org to Markdown.
+CONTENTS is nil. INFO is a plist holding contextual information."
+    (let ((prop-type (org-element-property :type export-block)))
+      (cond ((string= prop-type "LATEX")
+             (let ((core (org-remove-indentation (org-element-property :value export-block))))
+               (escape-gfm-latex-characters
+                (if (string-prefix-p "\\begin" core)
+                    core
+                  (concat "\\[\n" core "\\]")))))
+
+            ;; this is the default markdown behavior.
+            ((member prop-type '("MARKDOWN" "MD"))
+             (org-remove-indentation (org-element-property :value export-block)))
+
+            ;; Also include the default for HTML export blocks.
+            (t (org-export-with-backend 'html export-block contents info)))))
+
+  ;; This is so I can do an unnumbered preface.
+  (setq org-num-skip-unnumbered 't)
+
+  (defun with-filter (sym fn)
+    "I don't know how to do lexical rebinding, so this is the
+    best I can do."
+    (if (member sym org-export-filter-link-functions)
+        (funcall fn)
+      (progn (add-to-list 'org-export-filter-link-functions sym)
+             (funcall fn)
+             (setq org-export-filter-link-functions
+                   (remove sym org-export-filter-link-functions)))))
 
   ;; now, some code to export chapters.
-    (defun org-export-md-chapters ()
+  (defun org-export-md-chapters ()
     "Export all subtrees that are *not* tagged with :noexport: to
 separate files.
 
 Subtrees that do not have the :EXPORT_FILE_NAME: property set
 are exported to a filename derived from the headline text."
     (interactive)
-    (let ((ticker 1)
-          (fn 'org-gfm-export-to-markdown)
-          (modifiedp (buffer-modified-p)))
-      (save-excursion
-        (goto-char (point-min))
-        (goto-char (re-search-forward "^*"))
-        (set-mark (line-beginning-position))
-        (goto-char (point-max))
-        (org-map-entries
-         (lambda ()
-           (let ((export-file (org-entry-get (point) "EXPORT_FILE_NAME")))
-             (unless export-file
-               (org-set-property
-                "EXPORT_FILE_NAME"
-                (->> (nth 4 (org-heading-components))
-                     (replace-regexp-in-string " " "_")
-                     (replace-in-string ":" "")
-                     (downcase)
-                     (concat "md/" (number-to-string ticker) "_"))))
-             (deactivate-mark)
-             (funcall fn nil t)
+    (with-filter
+     'org-gfm-link-filter
+     (lambda ()
+       (let ((ticker 1)
+             (fn 'org-gfm-export-to-markdown)
+             (modifiedp (buffer-modified-p)))
+         (save-excursion
+           (goto-char (point-min))
+           (goto-char (re-search-forward "^*"))
+           (set-mark (line-beginning-position))
+           (goto-char (point-max))
+           (org-map-entries
+            (lambda ()
+              (let* ((export-file (org-entry-get (point) "EXPORT_FILE_NAME"))
+                     (unnumbered (org-entry-get (point) "UNNUMBERED"))
+                     (prefix (if unnumbered
+                                 "md/"
+                               (concat "md/" (number-to-string ticker) "_"))))
+                (unless export-file
+                  (org-set-property
+                   "EXPORT_FILE_NAME"
+                   (->> (nth 4 (org-heading-components))
+                        (replace-regexp-in-string " " "_")
+                        (replace-in-string ":" "")
+                        (downcase)
+                        (concat prefix))))
+                (deactivate-mark)
+                (funcall fn nil t)
 
-             ;; Increment the counter.
-             (setf ticker (1+ ticker))
+                ;; Increment the counter.
+                (unless unnumbered
+                  (setf ticker (1+ ticker)))
 
-             (unless export-file (org-delete-property "EXPORT_FILE_NAME"))
-             (set-buffer-modified-p modifiedp)))
-         "-noexport" 'region-start-level))))
+                (unless export-file (org-delete-property "EXPORT_FILE_NAME"))
+                (set-buffer-modified-p modifiedp)))
+            "-noexport" 'region-start-level)))))
 
-  ;; Then, we proceed.
-  (setq company-lsp-async t)
+    ;; Then, we proceed.
+    (setq company-lsp-async t))
   (setq org-directory "/Volumes/GoogleDrive/My Drive/org")
   (setq org-default-notes-file (concat org-directory "/notes.org"))
   (setq org-tasks-file (concat org-directory "/gtd.org"))
