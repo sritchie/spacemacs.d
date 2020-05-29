@@ -31,9 +31,8 @@
 (define-key global-map (kbd "C-+") 'text-scale-increase)
 (define-key global-map (kbd "C--") 'text-scale-decrease)
 
-;; org-mode good
-(define-key org-mode-map
-  (kbd "M-/") 'helm-org-in-buffer-headings)
+;; org-mode. This was nice, but NOT helpful, since it kills my expansion.
+;; (define-key org-mode-map (kbd "M-/") 'helm-org-in-buffer-headings)
 
 ;; regex for search, not the normal thing
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
