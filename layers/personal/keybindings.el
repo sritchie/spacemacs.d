@@ -2,6 +2,8 @@
 ;;
 ;; This is just stuff that I've grown to like over the years.
 
+(global-set-key (kbd "s-l") 'goto-line)
+
 (global-set-key (kbd "C-c q") 'join-line)
 
 ;; I like these better, for killing

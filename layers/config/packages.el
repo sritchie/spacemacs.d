@@ -70,6 +70,7 @@
           ("l" . "export latex")
           ("q" . "quote")
           ("s" . "src")
+          ("sc" . "src clojure")
           ("ss" . "src scheme")
           ("ssl" . "src scheme :results value raw :exports both :cache yes")
           ("se" . "src emacs-lisp")

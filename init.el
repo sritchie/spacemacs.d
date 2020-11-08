@@ -44,7 +44,9 @@ values."
 
    ;; List of configuration layers to load. (add more to config/layers.el)
    dotspacemacs-configuration-layers
-   '(rust
+   '(asciidoc
+     typescript
+     rust
      systemd
      (config :location local)
      (personal :location local)
@@ -55,7 +57,7 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(nand2tetris)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -340,7 +342,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (add-hook 'inferior-scheme-mode-hook #'turn-on-smartparens-strict-mode)
 
   ;; tex input! I had to run `set-input-method' with TeX to get this going.
-  (add-hook 'clojure-mode-hook 'toggle-input-method)
+  ;; (add-hook 'clojure-mode-hook 'toggle-input-method)
 
   ;; Trying this out. this should be so good for lisp.
   (add-hook 'scheme-mode-hook #'aggressive-indent-mode)
@@ -445,6 +447,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   ;; TODO this should only happen if you're actually in a github repository.
   ;;
+  (require 'git-link)
   ;; TODO it WOULD be nice to get some resizing going by emitting these images
   ;; as actual embedded HTML. for the future!
   (defun org-gfm-link-filter (text backend info)
@@ -574,6 +577,9 @@ are exported to a filename derived from the headline text."
            entry
            (function org-journal-find-location)
            "** %(format-time-string org-journal-time-format)%^{Title}\n%i%?")))
+
+  (setq nand2tetris-core-base-dir "~/code/nand2tetris")
+  (add-to-list 'auto-mode-alist '("\\.hdl\\'" . nand2tetris-mode))
 
   ;; hack to make sure 'company-lsp is only pushed after company package is loaded
   (use-package company

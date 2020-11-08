@@ -45,6 +45,7 @@
            python-format-on-save t
            python-formatter 'yapf
            python-backend 'lsp
+           python-sort-imports-on-save t
            )
    (scala :packages (not ensime)
           :variables
