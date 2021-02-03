@@ -558,6 +558,8 @@ are exported to a filename derived from the headline text."
 
   (pyvenv-workon "deep")
 
+  (global-undo-tree-mode)
+
   ;; TODO fix this!
   ;; (add-to-list 'org-agenda-files org-journal-dir)
 
@@ -580,6 +582,9 @@ are exported to a filename derived from the headline text."
 
   (setq nand2tetris-core-base-dir "~/code/nand2tetris")
   (add-to-list 'auto-mode-alist '("\\.hdl\\'" . nand2tetris-mode))
+  (add-to-list 'auto-mode-alist '("\\.vlad\\'" . scheme-mode))
+  (add-to-list 'auto-mode-alist '("\\.dvl\\'" . scheme-mode))
+  (add-to-list 'auto-mode-alist '("\\.sc\\'" . scheme-mode))
 
   ;; hack to make sure 'company-lsp is only pushed after company package is loaded
   (use-package company
