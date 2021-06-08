@@ -44,20 +44,20 @@ values."
 
    ;; List of configuration layers to load. (add more to config/layers.el)
    dotspacemacs-configuration-layers
-   '(asciidoc
-     typescript
-     rust
+   '(
      systemd
      (config :location local)
-     (personal :location local)
-     racket
-     )
+     (personal :location local))
 
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(nand2tetris)
+   dotspacemacs-additional-packages
+   '(nand2tetris
+     vega-view
+     edit-indirect)
+
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -330,6 +330,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (load custom-file)
   (setq org-tasks-file nil)
 
+  (setq nand2tetris-core-base-dir "~/code/nand2tetris")
 
   ;; I need this for now, since ensime-mode automatically adds itself.
   (add-hook 'scala-mode-hook (lambda () (ensime-mode -1)))
@@ -340,6 +341,10 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (add-hook 'clojure-mode-hook #'turn-on-smartparens-strict-mode)
   (add-hook 'cider-repl-mode-hook #'turn-on-smartparens-strict-mode)
   (add-hook 'inferior-scheme-mode-hook #'turn-on-smartparens-strict-mode)
+
+  (add-hook 'clojure-mode-hook
+            (lambda ()
+              (local-set-key (kbd "C-c v") 'vega-view)))
 
   ;; tex input! I had to run `set-input-method' with TeX to get this going.
   ;; (add-hook 'clojure-mode-hook 'toggle-input-method)
@@ -580,7 +585,13 @@ are exported to a filename derived from the headline text."
            (function org-journal-find-location)
            "** %(format-time-string org-journal-time-format)%^{Title}\n%i%?")))
 
-  (setq nand2tetris-core-base-dir "~/code/nand2tetris")
+  ;; Get code highlighting working on org-mode export
+  (setq org-latex-listings 'minted
+        org-latex-packages-alist '(("" "minted"))
+        org-latex-pdf-process
+        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
   (add-to-list 'auto-mode-alist '("\\.hdl\\'" . nand2tetris-mode))
   (add-to-list 'auto-mode-alist '("\\.vlad\\'" . scheme-mode))
   (add-to-list 'auto-mode-alist '("\\.dvl\\'" . scheme-mode))
@@ -592,8 +603,7 @@ are exported to a filename derived from the headline text."
     (push 'company-lsp company-backends))
 
   ;; Really exit?
-  (setq confirm-kill-emacs #'yes-or-no-p)
-  )
+  (setq confirm-kill-emacs #'yes-or-no-p))
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.

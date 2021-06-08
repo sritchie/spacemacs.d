@@ -8,6 +8,7 @@
                     auto-completion-enable-snippets-in-popup t)
    better-defaults
    git
+   gpu
    helm
    smex
    (org :variables
@@ -29,27 +30,29 @@
    docker
 
    ;; Markups
+   asciidoc
    csv
    html
    markdown
    yaml
 
    ;; Languages
+   coffeescript
    clojure
    emacs-lisp
    haskell
    javascript
+   typescript
+   racket
+   rust
    lsp
    markdown
    (python :variables
            python-format-on-save t
            python-formatter 'yapf
            python-backend 'lsp
-           python-sort-imports-on-save t
-           )
+           python-sort-imports-on-save t)
    (scala :packages (not ensime)
           :variables
           scala-auto-insert-asterisk-in-comments t
-          scala-backend 'scala-metals
-          )
-   ))
+          scala-backend 'scala-metals)))
