@@ -66,7 +66,20 @@
  '(python-indent-offset 2)
  '(python-shell-interpreter "ipython")
  '(safe-local-variable-values
-   '((cider-default-cljs-repl . shadow)
+   '((eval
+      (lambda nil
+        (when
+            (not
+             (featurep 'clerk))
+          (let
+              ((init-file-path
+                (expand-file-name "clerk.el" default-directory)))
+            (when
+                (file-exists-p init-file-path)
+              (load init-file-path)
+              (require 'clerk))))))
+     (javascript-backend . tide)
+     (cider-default-cljs-repl . shadow)
      (cider-preferred-build-tool . shadow-cljs)
      (cider-figwheel-main-default-options . ":dev")
      (cider-figwheel-main-default-options . ":fig")

@@ -363,6 +363,11 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (global-set-key (kbd "C-x C-k") 'kill-region)
   (global-set-key (kbd "s-/") 'comment-line)
 
+  ;; js.
+  (setq javascript-fmt-tool 'prettier)
+  (add-hook 'js2-mode-hook 'prettier-js-mode)
+  (add-hook 'web-mode-hook 'prettier-js-mode)
+
   ;; Get the pretty lambdas.
   (global-prettify-symbols-mode 1)
 
