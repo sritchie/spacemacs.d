@@ -44,8 +44,7 @@ values."
 
    ;; List of configuration layers to load. (add more to config/layers.el)
    dotspacemacs-configuration-layers
-   '(
-     systemd
+   '(systemd
      (config :location local)
      (personal :location local))
 
@@ -382,6 +381,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (sp-use-paredit-bindings)
 
   (require 'cmuscheme)
+
   (defun mechanics-local ()
     (interactive)
     (run-cmu-scheme "mechanics"))
@@ -429,7 +429,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (require 'ob-mit-scheme)
 
   ;; this is used by xscheme now.
-  (setq scheme-program-name "mechanics-osx")
+  (setq scheme-program-name "mechanics")
 
   ;; Now, the modifications for github flavored markdown export! This handles
   ;; extra-escaping the inline syntax, so it's available for processing by the

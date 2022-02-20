@@ -6,6 +6,7 @@
  '(ansi-color-names-vector
    ["#d2ceda" "#f2241f" "#67b11d" "#b1951d" "#3a81c3" "#a31db1" "#21b8c7" "#655370"])
  '(cider-print-fn 'pr)
+ '(cider-repl-display-help-banner nil)
  '(cider-repl-use-content-types t)
  '(company-quickhelp-color-background "#4F4F4F")
  '(company-quickhelp-color-foreground "#DCDCCC")

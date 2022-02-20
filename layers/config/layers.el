@@ -38,7 +38,9 @@
 
    ;; Languages
    coffeescript
-   (clojure :variables clojure-backend 'cider)
+   (clojure :variables
+            clojure-backend 'cider
+            clojure-enable-linters 'clj-kondo)
    emacs-lisp
    haskell
    javascript
