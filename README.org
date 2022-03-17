@@ -2,9 +2,9 @@
 
 This is my personal configuration for Spacemacs. To get started:
 
-- Install [[https://www.spacemacs.org][spacemacs]] by running the following commands. (You'll need to move
-  =~/.emacs.d= to some new place if it already exists; spacemacs takes over this
-  directory, and you instead configure =.spacemacs.d=.)
+Install [[https://www.spacemacs.org][spacemacs]] by running the following commands. (You'll need to move
+=~/.emacs.d= to some new place if it already exists; spacemacs takes over this
+directory, and you instead configure =.spacemacs.d=.)
 
   #+begin_src bash
 # Stash your old config, if existing
@@ -19,7 +19,7 @@ cd ~/.emacs.d
 git checkout 761e2025aa37981af99e9eb4964a9de8de7c9023
   #+end_src
 
-- Next, install this spacemacs configuration:
+Next, install this spacemacs configuration:
 
   #+begin_src bash
 git clone git@github.com:sritchie/spacemacs.d.git ~/.spacemacs.d
