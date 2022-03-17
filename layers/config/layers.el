@@ -15,6 +15,7 @@
         org-enable-github-support t
         org-enable-hugo-support t
         org-enable-org-journal-support t
+        org-enable-reveal-js-support t
         org-want-todo-bindings t)
    (shell :variables
           shell-default-height 30
@@ -41,6 +42,9 @@
    (clojure :variables
             clojure-backend 'cider
             clojure-enable-linters 'clj-kondo)
+
+   (scheme :variables scheme-implementations '(mit))
+
    emacs-lisp
    haskell
    javascript

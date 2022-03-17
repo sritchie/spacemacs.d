@@ -334,6 +334,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; I need this for now, since ensime-mode automatically adds itself.
   (add-hook 'scala-mode-hook (lambda () (ensime-mode -1)))
   (add-hook 'scheme-mode-hook #'turn-on-smartparens-strict-mode)
+  (add-hook 'geiser-repl-mode-hook #'turn-on-smartparens-strict-mode)
   (add-hook 'emacs-lisp-mode-hook #'turn-on-smartparens-strict-mode)
   (add-hook 'racket-mode-hook #'turn-on-smartparens-strict-mode)
   (add-hook 'racket-repl-mode-hook #'turn-on-smartparens-strict-mode)
@@ -350,6 +351,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   ;; Trying this out. this should be so good for lisp.
   (add-hook 'scheme-mode-hook #'aggressive-indent-mode)
+  (add-hook 'geiser-repl-mode-hook #'aggressive-indent-mode)
   (add-hook 'clojure-mode-hook #'aggressive-indent-mode)
   (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
   )
@@ -361,6 +363,16 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (global-set-key (kbd "C-w") 'backward-kill-word)
   (global-set-key (kbd "C-x C-k") 'kill-region)
   (global-set-key (kbd "s-/") 'comment-line)
+
+  (defun clerk-show ()
+    (interactive)
+    (save-buffer)
+    (let
+        ((filename
+          (buffer-file-name)))
+      (when filename
+        (cider-interactive-eval
+         (concat "(nextjournal.clerk/show! \"" filename "\")")))))
 
   ;; js.
   (setq javascript-fmt-tool 'prettier)
@@ -380,23 +392,23 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; the goods for lisps. Important.
   (sp-use-paredit-bindings)
 
-  (require 'cmuscheme)
+  ;; (require 'cmuscheme)
 
-  (defun mechanics-local ()
-    (interactive)
-    (run-cmu-scheme "mechanics"))
+  ;; (defun mechanics-local ()
+  ;;   (interactive)
+  ;;   (run-cmu-scheme "mechanics"))
 
-  ;; And finally, the goods for SICM.
-  (defun mechanics ()
-    (interactive)
-    (let ((default-directory (or (projectile-project-root)
-                                 default-directory)))
-      (call-interactively #'mechanics-local)))
+  ;; ;; And finally, the goods for SICM.
+  ;; (defun mechanics ()
+  ;;   (interactive)
+  ;;   (let ((default-directory (or (projectile-project-root)
+  ;;                                default-directory)))
+  ;;     (call-interactively #'mechanics-local)))
 
-  ;; Here's an older version that does NOT use my docker stuff.
-  (defun mechanics-osx ()
-    (interactive)
-    (run-cmu-scheme "mechanics-osx"))
+  ;; ;; Here's an older version that does NOT use my docker stuff.
+  ;; (defun mechanics-osx ()
+  ;;   (interactive)
+  ;;   (run-cmu-scheme "mechanics-osx"))
 
   ;; This is required for better LaTeX in org mode.
   (setq org-latex-create-formula-image-program 'dvisvgm)
@@ -425,11 +437,14 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; stuff.
   ;;
   ;; required to get org-mode exporting the goodies.
-  (load "~/.spacemacs.d/ob-mit-scheme.el")
-  (require 'ob-mit-scheme)
+  ;; (load "~/.spacemacs.d/ob-mit-scheme.el")
+  ;; (require 'ob-mit-scheme)
 
-  ;; this is used by xscheme now.
-  (setq scheme-program-name "mechanics")
+  ;; ;; this is used by xscheme now.
+  ;; (setq scheme-program-name "mechanics")
+  (setq geiser-mit-binary "/Users/sritchie/bin/mechanics")
+  (setq geiser-repl-current-project-function 'projectile-project-root)
+  (setq jit-lock-mode nil)
 
   ;; Now, the modifications for github flavored markdown export! This handles
   ;; extra-escaping the inline syntax, so it's available for processing by the

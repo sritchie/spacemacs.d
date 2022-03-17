@@ -14,7 +14,7 @@
    '("e6df46d5085fde0ad56a46ef69ebb388193080cc9819e2d6024c9c6e27388ba9" "d0fa4334234e97ece3d72d86e39a574f8256b4a8699a1fb5390c402892a1c024" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" default))
  '(evil-want-Y-yank-to-eol nil)
  '(fci-rule-color "#383838")
- '(geiser-mit-binary "/Users/sritchie/bin/mechanics-osx")
+ '(geiser-repl-current-project-function 'projectile-project-root t)
  '(helm-completion-style 'emacs)
  '(hl-todo-keyword-faces
    '(("TODO" . "#dc752f")
@@ -60,6 +60,7 @@
      ("" "amssymb" t nil)
      ("" "capt-of" nil nil)
      ("" "hyperref" nil nil)))
+ '(org-re-reveal-revealjs-version "4")
  '(package-selected-packages
    '(cfrs seq tern gntp hierarchy epc ctable concurrent deferred parent-mode window-purpose imenu-list haml-mode gitignore-mode fringe-helper git-gutter+ shrink-path json-snatcher json-reformat posframe lcr web-completion-data ghc sesman spinner queue parseclj a packed pkg-info epl s auto-complete popup goto-chg bind-map adoc-mode markup-faces edit-indirect nand2tetris tide typescript-mode import-js grizzl add-node-modules-path company-reftex company-auctex auctex-latexmk auctex toml-mode racer helm-gtags ggtags flycheck-rust counsel-gtags counsel swiper ivy cargo rust-mode pcache visual-fill-column htmlize git-gutter package-lint anzu bui treemacs pfuture parseedn clojure-mode flycheck anaconda-mode pythonic ace-window avy eval-sexp-fu lsp-mode markdown-mode ht dash-functional sbt-mode scala-mode paredit iedit smartparens haskell-mode company flx request helm helm-core yasnippet multiple-cursors skewer-mode js2-mode simple-httpd magit-popup magit git-commit with-editor transient alert log4e org-category-capture projectile pyvenv f spaceline powerline all-the-icons memoize dash bind-key async evil undo-tree hydra lv org-plus-contrib ox-gfm ox-hugo geiser racket-mode pos-tip faceup systemd dockerfile-mode docker tablist docker-tramp zenburn-theme yasnippet-snippets yapfify yaml-mode xterm-color ws-butler writeroom-mode winum which-key web-mode web-beautify vterm volatile-highlights vi-tilde-fringe uuidgen use-package unfill treemacs-projectile treemacs-magit toc-org tagedit symon symbol-overlay string-inflection spaceline-all-the-icons smex smeargle slim-mode shell-pop scss-mode sass-mode restart-emacs rainbow-delimiters pytest pyenv-mode py-isort pug-mode prettier-js popwin pippel pipenv pip-requirements persp-mode pcre2el password-generator paradox overseer orgit org-projectile org-present org-pomodoro org-mime org-journal org-download org-cliplink org-bullets org-brain open-junk-file noflet nodejs-repl nameless mwim mvn multi-term move-text mmm-mode meghanada maven-test-mode markdown-toc magit-svn magit-gitflow macrostep lsp-ui lsp-treemacs lsp-python-ms lsp-java lsp-haskell lorem-ipsum livid-mode live-py-mode link-hint json-navigator json-mode js2-refactor js-doc intero indent-guide importmagic impatient-mode hybrid-mode hungry-delete hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-org-rifle helm-org helm-mode-manager helm-make helm-lsp helm-hoogle helm-gitignore helm-git-grep helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag haskell-snippets groovy-mode groovy-imports graphviz-dot-mode gradle-mode google-translate golden-ratio gnuplot gitignore-templates gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy font-lock+ flycheck-pos-tip flycheck-package flycheck-haskell flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav editorconfig dumb-jump dotenv-mode doom-modeline diminish diff-hl devdocs define-word dap-mode dante cython-mode csv-mode company-web company-tern company-statistics company-lsp company-ghci company-ghc company-cabal company-anaconda column-enforce-mode cmm-mode clojure-snippets clean-aindent-mode cider-eval-sexp-fu cider centered-cursor-mode browse-at-remote blacken auto-yasnippet auto-highlight-symbol auto-compile attrap aggressive-indent ace-link ace-jump-helm-line ac-ispell))
  '(pdf-view-midnight-colors '("#655370" . "#fbf8ef"))
@@ -68,6 +69,28 @@
  '(python-shell-interpreter "ipython")
  '(safe-local-variable-values
    '((eval
+      (lambda nil
+        (defun cider-jack-in-wrapper-function
+            (orig-fun &rest args)
+          (if
+              (and
+               (boundp 'use-bb-dev)
+               use-bb-dev)
+              (message "Use `bb dev` to start the development server, then `cider-connect` to the port it specifies.")
+            (apply orig-fun args)))
+        (advice-add 'cider-jack-in :around #'cider-jack-in-wrapper-function)
+        (when
+            (not
+             (featurep 'clerk))
+          (let
+              ((init-file-path
+                (expand-file-name "clerk.el" default-directory)))
+            (when
+                (file-exists-p init-file-path)
+              (load init-file-path)
+              (require 'clerk))))))
+     (use-bb-dev . t)
+     (eval
       (lambda nil
         (when
             (not
@@ -134,4 +157,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(highlight-parentheses-highlight ((nil (:weight ultra-bold))) t))
