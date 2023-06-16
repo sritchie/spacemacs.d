@@ -44,7 +44,8 @@ values."
 
    ;; List of configuration layers to load. (add more to config/layers.el)
    dotspacemacs-configuration-layers
-   '(systemd
+   '(php
+     systemd
      (config :location local)
      (personal :location local))
 
@@ -325,6 +326,7 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
+
   (setq custom-file "~/.spacemacs.d/.custom-settings.el")
   (load custom-file)
   (setq org-tasks-file nil)
@@ -392,24 +394,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; the goods for lisps. Important.
   (sp-use-paredit-bindings)
 
-  ;; (require 'cmuscheme)
-
-  ;; (defun mechanics-local ()
-  ;;   (interactive)
-  ;;   (run-cmu-scheme "mechanics"))
-
-  ;; ;; And finally, the goods for SICM.
-  ;; (defun mechanics ()
-  ;;   (interactive)
-  ;;   (let ((default-directory (or (projectile-project-root)
-  ;;                                default-directory)))
-  ;;     (call-interactively #'mechanics-local)))
-
-  ;; ;; Here's an older version that does NOT use my docker stuff.
-  ;; (defun mechanics-osx ()
-  ;;   (interactive)
-  ;;   (run-cmu-scheme "mechanics-osx"))
-
   ;; This is required for better LaTeX in org mode.
   (setq org-latex-create-formula-image-program 'dvisvgm)
 
@@ -437,11 +421,31 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; stuff.
   ;;
   ;; required to get org-mode exporting the goodies.
-  ;; (load "~/.spacemacs.d/ob-mit-scheme.el")
-  ;; (require 'ob-mit-scheme)
+  (load "~/.spacemacs.d/ob-mit-scheme.el")
+  (require 'ob-mit-scheme)
 
   ;; ;; this is used by xscheme now.
-  ;; (setq scheme-program-name "mechanics")
+  (setq scheme-program-name "mechanics")
+
+  ;; THEN!!!! run these to overwrite run-scheme:
+  (require 'cmuscheme)
+
+  (defun mechanics-local ()
+    (interactive)
+    (run-scheme "mechanics"))
+
+  ;; And finally, the goods for SICM.
+  (defun mechanics ()
+    (interactive)
+    (let ((default-directory (or (projectile-project-root)
+                                 default-directory)))
+      (call-interactively #'mechanics-local)))
+
+  ;; ;; Here's an older version that does NOT use my docker stuff.
+  ;; (defun mechanics-osx ()
+  ;;   (interactive)
+  ;;   (run-cmu-scheme "mechanics-osx"))
+
   (setq geiser-mit-binary "/Users/sritchie/bin/mechanics")
   (setq geiser-repl-current-project-function 'projectile-project-root)
   (setq jit-lock-mode nil)
@@ -616,6 +620,7 @@ are exported to a filename derived from the headline text."
   (add-to-list 'auto-mode-alist '("\\.vlad\\'" . scheme-mode))
   (add-to-list 'auto-mode-alist '("\\.dvl\\'" . scheme-mode))
   (add-to-list 'auto-mode-alist '("\\.sc\\'" . scheme-mode))
+  (add-to-list 'auto-mode-alist '("\\.clj_kondo\\'" . clojure-mode))
 
   ;; hack to make sure 'company-lsp is only pushed after company package is loaded
   (use-package company

@@ -14,7 +14,14 @@
    (org :variables
         org-enable-github-support t
         org-enable-hugo-support t
+        org-enable-epub-support t
         org-enable-org-journal-support t
+
+        ;; org-roam!
+        org-enable-roam-support t
+        org-enable-roam-ui t
+        org-enable-protocol t
+
         org-enable-reveal-js-support t
         org-want-todo-bindings t)
    (shell :variables
@@ -43,8 +50,9 @@
             clojure-backend 'cider
             clojure-enable-linters 'clj-kondo)
 
-   (scheme :variables scheme-implementations '(mit))
+   ;; (scheme :variables scheme-implementations '(mit))
 
+   common-lisp
    emacs-lisp
    haskell
    javascript
@@ -55,7 +63,7 @@
    markdown
    (python :variables
            python-format-on-save t
-           python-formatter 'yapf
+           python-formatter 'black
            python-backend 'lsp
            python-sort-imports-on-save t)
    (scala :packages (not ensime)

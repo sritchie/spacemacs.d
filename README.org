@@ -25,5 +25,5 @@ Next, install this spacemacs configuration:
 git clone git@github.com:sritchie/spacemacs.d.git ~/.spacemacs.d
   #+end_src
 
-  Now open Emacs, watch a bunch of packages get installed and fix any errors you
-  see.
+Now open Emacs, watch a bunch of packages get installed and fix any errors you
+see.

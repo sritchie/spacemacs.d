@@ -43,10 +43,10 @@
 
 (show-paren-mode 1)
 
-(add-hook 'markdown-mode-hook '(lambda () (auto-fill-mode 0)))
-(add-hook 'text-mode-hook '(lambda () (auto-fill-mode 0)))
-(add-hook 'html-mode-hook '(lambda () (auto-fill-mode 0)))
-(add-hook 'org-mode-hook '(lambda () (auto-fill-mode 0)))
+(add-hook 'markdown-mode-hook #'(lambda () (auto-fill-mode 0)))
+(add-hook 'text-mode-hook #'(lambda () (auto-fill-mode 0)))
+(add-hook 'html-mode-hook #'(lambda () (auto-fill-mode 0)))
+(add-hook 'org-mode-hook #'(lambda () (auto-fill-mode 0)))
 
 (set-default 'imenu-auto-rescan t)
 

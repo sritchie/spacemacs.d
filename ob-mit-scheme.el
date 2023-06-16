@@ -9,6 +9,15 @@
 (require 'ob-scheme)
 (require 'xscheme)
 
+;; so that evaluations don't clobber the REPL evals.
+(setq xscheme-buffer-name "*xscheme*")
+
+(defun xscheme-wait-for-process ()
+  (sleep-for 0 100)
+  (while (not (string-equal xscheme-runlight-string "input"))
+    (message xscheme-runlight-string)
+    (sleep-for 0 200)))
+
 (defun run-xscheme (command-line)
   "Run MIT Scheme in an inferior process.
 Output goes to the buffer `*scheme*'.
@@ -137,7 +146,6 @@ is true; otherwise returns the last value."
       (delete-region (point-min) (point-max)))
     (xscheme-send-string code-to-execute)
     (xscheme-wait-for-process)
-    (sleep-for 1) ; neeed to wait: buffer does not update immidiately
     (message "Scheme: done!")
     (with-current-buffer (xscheme-process-buffer)
       (let ((repl-content (buffer-substring-no-properties (point-min) (point-max))))
